@@ -168,7 +168,7 @@ Parametres processaParametres(int argn, char **argv) {
     return p;
 }
 
-int llegirDades(const string &path, set<Vol> &vols) {
+int llegirDades(const string &path, vector<Vol> &vols) {
     ifstream f(path.c_str());
     if (!f.is_open()) {
         throw excepcio::entradaIncorrecta(
@@ -197,7 +197,7 @@ int llegirDades(const string &path, set<Vol> &vols) {
                 throw excepcio::errorLectura("Error llegint les dades dels vols.");
             }
             Vol v(id, tipus, mida, tv1, tv2);
-            vols.emplace(v);
+            vols.emplace_back(v);
             nDades++;
         } catch (...) {
             throw excepcio::errorLectura("Error leyendo los datos de vuelos.");

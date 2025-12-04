@@ -16,7 +16,6 @@ using namespace std;
 
 class Vol {
 public:
-    Vol();
 // asume que los datos han sido validados
     Vol(int id, char desti, char capacitat, const string &horaInMin, const string &horaFiMax)
         : _id(id), _desti(desti), _capacitat(capacitat), _horaInMin(horaInMin), _horaFiMax(horaFiMax) {
@@ -26,15 +25,15 @@ public:
         else _slotsUs = 8;
     }
 
-    int obtSlotsUs();
+    int obtSlotsUs() const;
 
-    string obtCapacitat();
+    char obtCapacitat() const;
 
-    string obtHoraInMin();
+    string obtHoraInMin() const;
 
-    string obtHoraFiMax();
+    string obtHoraFiMax() const;
 
-    char obtDesti();
+    char obtDesti() const;
 
     bool operator<(const Vol &v) const;
 

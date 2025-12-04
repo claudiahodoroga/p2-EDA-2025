@@ -5,9 +5,8 @@
 #include "Solucionador.h"
 
 void Voraz::solucionar(const Solucio &sol) {
-    int maxSlots = 0; // todo: calcular con método auxiliar
-    Candidats cand = sol.inicialitzarCandidats();
 
+    Candidats cand = sol.inicialitzarCandidats();
     while (!sol.completa() && !cand.esFiSlots()) {
         if (sol.completable(cand.actual())) {
             sol.anotar(cand.actual());

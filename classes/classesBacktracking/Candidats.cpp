@@ -8,7 +8,7 @@ pair<int, int> Candidats::actual() const {
     if (!esFiSlots()) {
         return {_idxPorta, _idxSlot};
     }
-    else return{-1, -1};
+    return{-1, -1};
 }
 
 void Candidats::seguent() {

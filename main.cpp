@@ -30,11 +30,11 @@ int main(int argn, char **argv) {
 
             cerr << "Fitxer de entrada de vols: " << p.path << endl;
 
-            set<Vol> vols;
+            vector<Vol> vols;
             int dades = llegirDades(p.path, vols);
             cout << " ==> " << dades << " vols llegits." << endl;
-
-            Solucio sol(p.Pr, p.Pi, p.Ho, p.Ht);
+            char destiInicial = vols[0].obtDesti();
+            Solucio sol(p.Pr, p.Pi, p.Ho, p.Ht, destiInicial);
 
             high_resolution_clock::time_point t1 = high_resolution_clock::now();
 

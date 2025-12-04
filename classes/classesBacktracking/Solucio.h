@@ -18,29 +18,30 @@
 
 class Solucio {
 public:
-    Solucio(int maxPortesReg, int maxPortesInt, string Ho, string Ht);
+    Solucio(int maxPortesReg, int maxPortesInt, const string& Ho, const string& Ht, char destiInicial);
     // inicializa candidatos con el número máximo de puertas regionales, internacionales, y número de slots máximos según las horas activas del aeropuerto
     Candidats inicialitzarCandidats() const;
     bool acceptable(const pair<int,int>& cand) const;
-    void anotar(const pair<int,int>& cand) const;
-    void desanotar(const pair<int, int>& cand) const;
+    void anotar(const pair<int,int>& cand);
+    void desanotar(const pair<int, int>& cand);
     bool completa() const;
     bool completable(const pair<int,int> & cand) const;
     //bool millorable(const Candidats& candidats) const;
+
 private:
     vector<Porta> _portes; // ASIGNACIÓN FINAL, cada puerta contiene n slots disponibles
-    int _slotsInactius; // número de slots sin utilizar
+    int _slotsInactius; ///< número de slots sin utilizar
     //int _minGap; por ahora no lo uso
-    double _tempsComput; // segundos que tarda en ejecutarse
-    int _niv; // nivel = vuelo al que se le está asignando slots
+    int _niv; ///< nivel = vuelo al que se le está asignando slots
 
-    int _maxPortesReg;
-    int _maxPortesInter;
-    string _ho;
-    string _ht;
+    int _maxPortesReg;  ///< guarda el número máximo de puertas regionales posibles
+    int _maxPortesInter;  ///< guarda el número máximo de puertas internacionales posibles
+    int _maxSlots; ///< guarda el número máximo de slots por puerta disponibles
+    string _ho; ///< guarda la hora de apertura del aeropuerto
+    string _ht; ///< guarda la hora de cierre del aeropuerto
 
-    int _nPortesReg;
-    int _nPortesInter;
+    int _nPortesReg; ///< guarda el número actual de puertas regionales en uso
+    int _nPortesInter; ///< guarda el número actual de puertas internacionales en uso
 };
 
 
