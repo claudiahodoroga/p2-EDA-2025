@@ -27,6 +27,8 @@ class Porta {
         int obtSlot(int idx) const; ///< devuelve número guardado en un slot idx; 0 => sin ocupar, >0 => ocupado por un vuelo de _vols
         char obtTipus() const;
 
+        void afegirVol(const Vol & v, int slot_inicio);
+
     private:
         char _tipus; ///< tipo de puerta, regional o internacional; r, i
         int _nVols; ///< número total de vuelos

@@ -4,20 +4,43 @@
 
 #include "Candidats.h"
 
-int Candidats::actual() const {
-    if (!esFiSlots()) {
-        return _idxSlot;
+
+Candidats::Candidats(int numPortes, int maxSlots, bool potCrearPorta)
+    : _idxPorta(0), _idxSlot(0), _numPortes(numPortes), _maxSlots(maxSlots), _potCrearPorta(potCrearPorta){
+    // si no existen puertas y no se pueden crear nuevas, acabar
+    if (_numPortes <= 0 && !_potCrearPorta) _esFi = true;
+}
+
+pair<int, int> Candidats::actual() const {
+    if (_esFi) {
+        return{-1,-1}; // devolver candidato inválido
     }
-    return -1;
+    return {_idxPorta, _idxSlot};
 }
 
 void Candidats::seguent() {
-    if (!esFiSlots()) {
+    if (!_esFi) {
+        // probar slot siguiente en puerta actual
         _idxSlot++;
+        if (_idxSlot >= _maxSlots) {
+            // probar siguiente puerta si se han probado todos los slots de la acual
+            _idxSlot = 0;
+            _idxPorta++;
+
+            // si se han probado todas las puertas existentes, intentar crear una nueva
+            if (_potCrearPorta && _idxPorta == _numPortes) { // segunda condición significa que se crea una puerta nueva
+                _idxSlot = 0;
+                _idxPorta = _numPortes;
+                _potCrearPorta = false;
+            }
+            else {
+                // ya no quedan candidatos
+                _esFi = true;
+            }
+        }
     }
-    else cerr << "no hay más slots disponibles" << endl;
 }
 
-bool Candidats::esFiSlots() const {
-    return _idxSlot > _maxSlots;
+bool Candidats::esFi() const {
+    return _esFi;
 }

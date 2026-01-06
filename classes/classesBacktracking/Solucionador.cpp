@@ -4,6 +4,98 @@
 
 #include "Solucionador.h"
 
+// TODO: pasar solución inicial a los métodos...
+
+// SOLUCIONADOR VORAZ
+bool SolucionadorVoraz::solucionar() {
+    return _sol.assignarVolsVoraz();
+}
+
+void SolucionadorVoraz::mostrarResultat() const {
+    _sol.mostrarSolucio();
+}
+
+// SOLUCIONADOR UNA SOLUCIÓN
+bool SolucionadorUna::solucionar() {
+    _trobat = false;
+    backtracking();
+    return _trobat;
+}
+
+void SolucionadorUna::backtracking() {
+    Candidats cand = _sol.inicialitzarCandidats();
+
+    while (!cand.esFi() && !_trobat) {
+        pair<int, int> portaSlot = cand.actual();
+        if (_sol.acceptable(portaSlot.first, portaSlot.second)) {
+            _sol.anotar(portaSlot.first, portaSlot.second);
+            backtracking();
+            if (!_trobat) {
+                _sol.desanotar(portaSlot.first, portaSlot.second);
+            }
+        }
+        cand.seguent();
+    }
+}
+
+void SolucionadorUna::mostrarResultat() const {
+    if (_trobat) {
+        _sol.mostrarSolucio();
+    }
+    else throw("No hi ha solució per la configuració indicada");
+}
+
+// BACKTRACKING MILLOR SOLUCIO
+bool SolucionadorMillor::solucionar() {
+    _trobatAlguna = false;
+    backtracking();
+    return _trobatAlguna;
+}
+
+void SolucionadorMillor::backtracking(SolucioMillor& sol) {
+    Candidats cand = sol.inicialitzarCandidats();
+
+    while (!cand.esFi()) {
+        pair<int, int> portaSlot = cand.actual();
+        if (sol.acceptable(portaSlot.first, portaSlot.second) &&
+            sol.potSerMillor()) {
+            sol.anotar(portaSlot.first, portaSlot.second);
+            backtracking(sol);
+            sol.desanotar(portaSlot.first, portaSlot.second);
+        }
+        cand.seguent();
+    }
+}
+
+void SolucionadorMillor::mostrarResultat(const SolucioMillor& sol) const {
+    if (_trobatAlguna) {
+        sol.mostrarSolucio();
+    }
+    else throw("No hi ha solució per la configuració indicada.");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 void Voraz::solucionar(Solucio &sol) {
     Candidats cand = sol.inicialitzarCandidats();
     while (!sol.completa() && !cand.esFiSlots()) {

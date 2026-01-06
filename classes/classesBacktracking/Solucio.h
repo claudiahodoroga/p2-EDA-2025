@@ -70,7 +70,7 @@ class SolucioVoraz : public Solucio {
     SolucioVoraz(int maxPortesReg, int maxPortesInt, const string& Ho, const string& Ht, const vector<Vol>& vols)
         : Solucio(maxPortesReg, maxPortesInt, Ho, Ht, vols) {}
 
-    bool assignarVolsVorac(); ///< Asigna vuelos con método voraz. Devuelve true si todos están asignados
+    bool assignarVolsVoraz(); ///< Asigna vuelos con método voraz. Devuelve true si todos están asignados
 
     private:
     bool assignarVol(int idxVol); ///< Intenta asignar un vuelo al primer slot disponible. Devuelve true si se puede
@@ -111,9 +111,11 @@ class SolucioMillor : public SolucioBacktracking {
     : SolucioBacktracking(maxPortesReg, maxPortesInt, Ho, Ht, vols), _millorSlotsInactius(INT_MAX), _millorMinGap(-1) {}
     bool esMillor() const; ///< Comprobar si la solución actual es mejor que la optima
     bool potSerMillor() const; ///< Comprobar si la solución actual puede llegar a ser mejor que la optima
-
+    void guardarMillor();
     private:
     vector<Porta> _millorPortes;
+    int _millorSlotsInactius;
+    int _millorMinGap;
 
 };
 

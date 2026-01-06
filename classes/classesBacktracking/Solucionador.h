@@ -46,8 +46,11 @@ private:
 class SolucionadorMillor : public Solucionador {
 public:
     SolucionadorMillor(SolucioMillor& sol) : _optima(sol), _trobatAlguna(false){}
+
+    bool solucionar() override;
+    void mostrarResultat(const SolucioMillor& sol) const override;
 private:
-    void backtracking(); ///< Recursividad
+    void backtracking(SolucioMillor& sol); ///< Recursividad
     SolucioMillor& _optima;
     bool _trobatAlguna; ///< Para saber si al menos hay una solución
 };

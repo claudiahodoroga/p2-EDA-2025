@@ -26,12 +26,11 @@ class Candidats {
     public:
     /**
      * Constructor
-     * @param numGates Current number of gates in solution
+     * @param numPortes Current number of gates in solution
      * @param maxSlots Maximum slots per gate
-     * @param canCreateGate Whether we can create a new gate
+     * @param potCrearPorta Whether we can create a new gate
      */
-        Candidats(int numGates, int maxSlots, bool potCrearPorta)
-            : _idxSlot(0), _maxSlots(maxSlots) {}
+        Candidats(int numPortes, int maxSlots, bool potCrearPorta);
         pair<int, int> actual() const; ///< Obtener candidato actual
         void seguent();
         bool esFi() const;
@@ -40,6 +39,8 @@ class Candidats {
         int _idxSlot; ///< Slot desde el que se está considerando
         int _numPortes; ///< Número de puertas existentes
         int _maxSlots; ///< Máximo número de slots por puerta
+        bool _potCrearPorta; ///< Para saber si se pueden crear puertas
+        bool _esFi; ///< Para saber que se ha llegado al final
 };
 
 
