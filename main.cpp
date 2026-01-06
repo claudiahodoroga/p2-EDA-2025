@@ -15,6 +15,7 @@
 using namespace std::chrono;
 using namespace std;
 
+// TODO: diferentes tipos de algoritmo tendrán diferentes tipos de solución. cambiar la declaración de sol. a mostrar hay que enviarle el tipo de sol :P o algo nose
 int main(int argn, char **argv) {
     try {
         Parametres p = processaParametres(argn, argv);

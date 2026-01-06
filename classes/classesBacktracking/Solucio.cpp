@@ -18,14 +18,11 @@ Solucio::Solucio(int maxPortesReg, int maxPortesInt, const string& Ho, const str
 
     _maxPortesReg = maxPortesReg;
     _maxPortesInter = maxPortesInt;
-    _ho = Ho;
-    _ht = Ht;
+    _ho = horaToMin(Ho);
+    _ht = horaToMin(Ht);
 
     // calcular numero de slots en función de las horas de apertura del aeropuerto
-    int hoMin = horaToMin(_ho);
-    int htMin = horaToMin(_ht);
-
-    int duracio = htMin - hoMin; // tiempo de apertura del aeropuerto en minutos
+    int duracio = _ht - _ho; // tiempo de apertura del aeropuerto en minutos
     int nSlots = duracio / 15;
 
     _maxSlots = nSlots;
@@ -39,12 +36,53 @@ Solucio::Solucio(int maxPortesReg, int maxPortesInt, const string& Ho, const str
         _nPortesInter = 1;
     }
 
-    _portes.resize(1, Porta(0, destiInicial, _maxSlots)); // vector se irá agrandando de forma dinámica
+    _portes.resize(1, Porta(destiInicial, _maxSlots)); // vector se irá agrandando de forma dinámica
 }
 
 Candidats Solucio::inicialitzarCandidats() const {
-    return {0, _maxSlots, (_maxPortesInter+_maxPortesReg)};
+    return Candidats(_maxSlots);
 }
+
+/**
+ * será aceptable si:
+ * - hay una puerta compatible con slots disponibles
+ * - se puede crear una puerta nueva compatible
+ * - dentro de la puerta, hay un número de slots disponibles en el rango de horas del vuelo
+ */
+
+bool Solucio::acceptable(char tipus, int horaIniciMinuts, int horaFiMinuts, int slotsUs) const {
+    bool acceptable = false;
+    // buscar si existe puerta compatible
+    int porta = 1;
+    bool trobat = false;
+    while (porta < _portes.size() && not trobat) {
+        // si la puerta es del mismo tipo que el vuelo y tiene suficientes slots libres, ver si se puede usar
+        if (_portes[porta].obtTipus() == tipus && _portes[porta].obtNSlotsOcupats() >= slotsUs) {
+            // comprobar si tiene slots disponibles en el rango de horas del vuelo
+            int slot = 0;
+            bool esRangInici = false;
+            int minutsSlot = 0;
+            while (slot < _maxSlots && not esRangInici) {
+                // convertir índice de slot a minutos?
+                if ((_ho+minutsSlot) >= horaIniciMinuts) esRangInici = true; // cada slot = 15 minutos. si es <= a horaIniciMinuts, significa que está dentro del rango de inicio
+                else {
+                    slot++;
+                    minutsSlot += 15;
+                }
+            }
+
+            // si es rango de inicio, comprobar que se puedan ocupar los suficientes slots y que esté en el rango de final del servicio
+            if (esRangInici) {
+                bool teSlotsSuficientes = true;
+                while (slot < _maxSlots && slot < slotsUs && teSlotsSuficientes) {
+                    if (_portes[porta].obtSlot(slot)==0) algo; // nose
+                }
+            }
+        }
+    }
+}
+
+
 
 // anotar un candidato significa que se le asignan los slots a un vuelo
 // y se pasa al siguiente vuelo

@@ -6,27 +6,40 @@
 #define P2_EDA_2025_CANDIDATS_H
 
 #include <iostream>
-#include <iomanip>
-#include <limits>
-#include <vector>
+#include <utility>
 
 using namespace std;
 
+/**
+ * Candidats: Generates all possible (gate, slot) assignments for current flight
+ *
+ * For a flight at level `niv`, we try:
+ * 1. All existing gates, all compatible slots
+ * 2. Creating a new gate (if allowed), starting at earliest valid slot
+ *
+ * A candidate is represented as pair<int, int>:
+ * - first: gate index (or numGates to indicate "create new gate")
+ * - second: starting slot index
+ */
+
 class Candidats {
     public:
-    // primer slot de la puerta porta
-        Candidats(int porta, int maxSlots, int maxPortes)
-            : _idxPorta(porta), _idxSlot(0), _maxSlots(maxSlots), _maxPortes(maxPortes) {}
-        pair<int, int> actual() const;
+    /**
+     * Constructor
+     * @param numGates Current number of gates in solution
+     * @param maxSlots Maximum slots per gate
+     * @param canCreateGate Whether we can create a new gate
+     */
+        Candidats(int numGates, int maxSlots, bool potCrearPorta)
+            : _idxSlot(0), _maxSlots(maxSlots) {}
+        pair<int, int> actual() const; ///< Obtener candidato actual
         void seguent();
-        bool esFiSlots() const;
-        bool esFiPortes() const;
+        bool esFi() const;
     private:
-    // se accede a la solución, que contiene el vector de puertas con sus slots
-        int _idxPorta; // guarda la puerta que se está considerando
-        int _idxSlot; // guarda el índice de slot que se está considerando
-        int _maxSlots; // numero máximo de slots
-        int _maxPortes; // máximas puertas internacionales
+        int _idxPorta; ///< Indice de la puerta que se está considerando
+        int _idxSlot; ///< Slot desde el que se está considerando
+        int _numPortes; ///< Número de puertas existentes
+        int _maxSlots; ///< Máximo número de slots por puerta
 };
 
 

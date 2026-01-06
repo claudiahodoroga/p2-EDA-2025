@@ -154,7 +154,7 @@ Parametres processaParametres(int argn, char **argv) {
         } else if (param == "-v") {
             p.tipoCalculo = 'v';
         } else if (nParams == argn - 1) {
-            // TODO: excepción de si no está incluido el ppath
+            // TODO: excepción de si no está incluido el path
             // Asume que el último parámetro es el path
             p.path = argv[nParams];
         }
