@@ -15,7 +15,7 @@ void Porta::afegirVol(const Vol &v, int slotInici) {
     // marcar slots como ocupados
     int nSlots = v.obtSlotsUs();
     for (int i=0; i<nSlots; i++) {
-        _slots[slotInici+1] = idxVol;
+        _slots[slotInici+i] = idxVol;
     }
 
     _nSlotsOcupats += nSlots;
@@ -29,7 +29,7 @@ void Porta::quitarVol(const Vol &v, int slotInici) {
         int slotIniciAfegit = _volSlotsInicials[volId]; // vuelo a eliminar
         int nSlots = v.obtSlotsUs();
         for (int i=0; i<nSlots; i++) {
-            _slots[slotIniciAfegit+1] = 0;
+            _slots[slotIniciAfegit+i] = 0;
         }
 
         _nSlotsOcupats -= nSlots;
@@ -75,7 +75,7 @@ int Porta::calcularMinGap() const {
             while (i< _slots.size() && _slots[i]!=0) {
                 i++;
             }
-            int fi = 1;
+            int fi = i-1;
             if (anterior != -1) {
                 int gap = inici - anterior;
                 if (gap<minGap) {
@@ -104,14 +104,14 @@ void Porta::mostrar(int ho, const vector<Vol> &vols) const {
     cout << "* -------------------------------------*" << endl;
 
     // mostrar info de  cada vuelo
-    for (int i=1; i<=_nVols; i++) {
+    for (int i=0; i<_nVols; i++) {
         int volId = _vols[i].obtId();
 
         // obtener slot de inicio para este vuelo
         map<int, int>::const_iterator it = _volSlotsInicials.find(volId);
         if (it != _volSlotsInicials.end()) {
             int slotInici = it->second;
-            int slotsUs = vols[i].obtSlotsUs();
+            int slotsUs = _vols[i].obtSlotsUs();
 
             // calcular hora de salida en minutos
             int horaSortida = ho + ((slotInici + slotsUs)*15);

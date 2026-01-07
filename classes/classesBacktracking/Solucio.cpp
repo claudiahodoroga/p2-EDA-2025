@@ -99,7 +99,6 @@ int Solucio::calcularMinGap() const {
     else return minGap;
 }
 
-// TODO: comprobar formatos de la función
 void Solucio::mostrarSolucio() const {
     for (size_t i = 0; i < _portes.size(); i++) {
         cout << "****************************************" << endl;
@@ -125,9 +124,9 @@ SolucioVoraz::SolucioVoraz(int maxPortesReg, int maxPortesInt, const string& Ho,
 void SolucioVoraz::ordenarVols() {
     sort(_vols.begin(), _vols.end(), [](const Vol& a, const Vol& b) {
         // primero los vuelos internacionales
-            if (a.obtDesti()=='i' && b.obtDesti()=='r') {
-                return true;
-            }
+        if (a.obtDesti()=='i' && b.obtDesti()=='r') {
+            return true;
+        }
         if (a.obtDesti()=='r' && b.obtDesti()=='i') {
             return false;
         }
@@ -175,23 +174,24 @@ bool SolucioVoraz::assignarVol(int idxVol) {
 
         // verificar compatibilidad con el rango horario del vuelo
         int horaSortida = _ho + (idxSlot + slotsNecessaris) * 15;
-        if (horaSortida < horaInMin || horaSortida > horaFiMax) {
-            // encontrar slot disponible lo más temprano posible
-            for (int slot=0; slot < _maxSlots - slotsNecessaris + 1; slot++) {
-                int sortidaTest = _ho + (slot + slotsNecessaris) * 15;
-                if (sortidaTest >= horaInMin && sortidaTest <= horaFiMax) {
-                    idxSlot = slot;
-                    break;
-                }
+        bool slotValid = (horaSortida >= horaInMin && horaSortida <= horaFiMax);
+
+        int slot = 0;
+        while (slot <= _maxSlots - slotsNecessaris && !slotValid) {
+            int testSortida = _ho + (slot + slotsNecessaris) * 15;
+            if (testSortida >= horaInMin && testSortida <= horaFiMax) {
+                idxSlot = slot;
+                slotValid = true;
             }
+            else slot++;
         }
+        if (!slotValid) return false;
     }
     // asignar vuelo
     _portes[idxPorta].afegirVol(vol, idxSlot);
     return true;
 }
 
-// TODO: quitar break
 pair<int, int> SolucioVoraz::trobarPrimeraOpcio(const Vol& vol) const {
     int slotsNecessaris = vol.obtSlotsUs();
     int horaInMin = horaToMin(vol.obtHoraInMin());
@@ -203,20 +203,26 @@ pair<int, int> SolucioVoraz::trobarPrimeraOpcio(const Vol& vol) const {
         // comprobar compatibilidad
         if (!(vol.obtDesti() == 'i' && p.obtTipus() == 'r')) { // los internacionales no pueden usar puertas regionales
             // probar cada slot en esta puerta
-            for (int idxSlot=0; idxSlot < _maxSlots-slotsNecessaris+1; idxSlot++) {
+            int slot = 0;
+            while (slot <= _maxSlots - slotsNecessaris) {
+                // comprobar si hay slots disponibles
                 bool disponible = true;
-                for (int i=0; i<slotsNecessaris; i++) {
-                    if (p.obtSlot(idxSlot+i) != 0) {
+                int k = 0;
+                while (k< slotsNecessaris && disponible) {
+                    if (p.obtSlot(slot+k) !=0) {
                         disponible = false;
-                        break; // NOOOO
+                    }
+                    k++;
+                }
+
+                if (disponible) {
+                    // comprobar compatibilidad temporal
+                    int horaSortida = _ho + ((slot + slotsNecessaris) * 15);
+                    if (horaSortida >= horaInMin && horaSortida <= horaFiMax) {
+                        return make_pair(idxPorta, horaSortida);
                     }
                 }
-                if (disponible) {
-                    int horaServei = _ho + (idxSlot * 15);
-                    int horaSortida = horaServei + (slotsNecessaris * 15);
-
-                    if (horaSortida >= horaInMin && horaSortida <= horaFiMax) return {idxPorta, idxSlot};
-                }
+                slot++;
             }
         }
     }
@@ -287,7 +293,7 @@ void SolucioBacktracking::anotar(int idxPorta, int slotInicio) {
 
 void SolucioBacktracking::desanotar(int idxPorta, int slotInicio) {
     _niv--;
-    if (_niv > 0 && _niv <= _vols.size()) {
+    if (_niv >= 0 && _niv < _vols.size()) {
         const Vol& vol = _vols[_niv];
         _portes[idxPorta].quitarVol(vol, slotInicio);
         if (idxPorta == _portes.size()-1 && _portes[idxPorta].obtNSlotsOcupats() == 0) {
@@ -354,9 +360,6 @@ bool SolucioMillor::esMillor(int optimaSlotsInactius, int optimaMinGap) const {
 bool SolucioMillor::potSerMillor(int idxPortaCand, int idxSlotCand, int optimaSlotsInactius) const {
     if (optimaSlotsInactius == INT_MAX) {
         return true; // todavía no se ha encontrado una solución
-    }
-    if (_niv >= _vols.size()) {
-        return false; // ?
     }
 
     const Vol& vol = _vols[_niv];

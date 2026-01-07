@@ -6,7 +6,7 @@
 
 
 Candidats::Candidats(int numPortes, int maxSlots, bool potCrearPorta)
-    : _idxPorta(0), _idxSlot(0), _numPortes(numPortes), _maxSlots(maxSlots), _potCrearPorta(potCrearPorta){
+    : _idxPorta(0), _idxSlot(0), _numPortes(numPortes), _maxSlots(maxSlots), _potCrearPorta(potCrearPorta), _esFi(false){
     // si no existen puertas y no se pueden crear nuevas, acabar
     if (_numPortes <= 0 && !_potCrearPorta) _esFi = true;
 }
@@ -28,12 +28,11 @@ void Candidats::seguent() {
             _idxPorta++;
 
             // si se han probado todas las puertas existentes, intentar crear una nueva
-            if (_potCrearPorta && _idxPorta == _numPortes) { // segunda condición significa que se crea una puerta nueva
-                _idxSlot = 0;
-                _idxPorta = _numPortes;
-                _potCrearPorta = false;
-            }
-            else {
+           if (_idxPorta == _numPortes && _potCrearPorta) {
+               // _idxPorta es el índice de la nueva puerta
+               _potCrearPorta = false;
+           }
+            else if (_idxPorta > _numPortes) {
                 // ya no quedan candidatos
                 _esFi = true;
             }

@@ -35,7 +35,9 @@ void SolucionadorUna::backtracking(SolucioUna& actual) {
                     actual.desanotar(idxPorta, idxSlot);
                 }
             }
-            _trobat = true;
+            else {
+                _trobat = true;
+            }
         }
         cands.seguent();
     }
