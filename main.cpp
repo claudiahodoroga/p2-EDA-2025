@@ -15,7 +15,6 @@
 using namespace std::chrono;
 using namespace std;
 
-// TODO: diferentes tipos de algoritmo tendrán diferentes tipos de solución. cambiar la declaración de sol. a mostrar hay que enviarle el tipo de sol :P o algo nose
 int main(int argn, char **argv) {
     try {
         Parametres p = processaParametres(argn, argv);
@@ -23,8 +22,6 @@ int main(int argn, char **argv) {
         if (p.ajuda) {
             mostrarAjuda(argv[0]);
         } else {
-            // Validación de path movida a `processaParametres` para una mejor separación de lógica,
-            // pero se mantiene aquí el check inicial si se prefiere.
             if (p.path.empty()) {
                 throw excepcio::entradaIncorrecta("Error: falta el nom del fitxer.");
             }
@@ -34,32 +31,45 @@ int main(int argn, char **argv) {
             vector<Vol> vols;
             int dades = llegirDades(p.path, vols);
             cout << " ==> " << dades << " vols llegits." << endl;
-            char destiInicial = vols[0].obtDesti();
-            Solucio sol(p.Pr, p.Pi, p.Ho, p.Ht, destiInicial);
 
             high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
             if (p.tipoCalculo == 'v') {
                 cerr << "usando solucionador voraz" << endl;
-                Voraz solucionadorVoraz;
-                solucionadorVoraz.solucionar(sol);
+
+                SolucioVoraz sol(p.Pr, p.Pi, p.Ho, p.Ht, vols);
+                SolucionadorVoraz solucionador;
+                solucionador.solucionar(sol);
+
+                high_resolution_clock::time_point t2 = high_resolution_clock::now();
+                duration<double> duracio = duration_cast<duration<double>>(t2 - t1);
+
+                mostrarResultat(sol, duracio);
             }
-            else if (p.tipoCalculo == 'b') {
+            else if (p.tipoCalculo == 'b') { // TODO: no se especificará una b, sino que se incluirá sin el parámetro
                 cerr << "usando backtracking una solución" << endl;
-                BacktrackingUnaSol solucinadorUnaSol;
-                solucinadorUnaSol.solucionar(sol);
+
+                SolucioUna sol(p.Pr, p.Pi, p.Ho, p.Ht, vols);
+                SolucionadorUna solucionador;
+                solucionador.solucionar(sol);
+
+                high_resolution_clock::time_point t2 = high_resolution_clock::now();
+                duration<double> duracio = duration_cast<duration<double>>(t2 - t1);
+
+                mostrarResultat(sol, duracio);
             }
             else if (p.tipoCalculo == 'm') {
                 cerr << "usando backtracking mejor solución" << endl;
-                BacktrackingMillorSol solucionadorMillorSol;
-                solucionadorMillorSol.solucionar(sol);
+
+                SolucioMillor sol(p.Pr, p.Pi, p.Ho, p.Ht, vols);
+                SolucionadorMillor solucionador;
+                solucionador.solucionar(sol);
+
+                high_resolution_clock::time_point t2 = high_resolution_clock::now();
+                duration<double> duracio = duration_cast<duration<double>>(t2 - t1);
+
+                mostrarResultat(sol, duracio);
             }
-
-            high_resolution_clock::time_point t2 = high_resolution_clock::now();
-            // calcular tiempo de cómputo del algoritmo
-            duration<double> duracio = duration_cast< duration<double> >(t2 - t1);
-
-            mostrarResultat(sol, duracio);
         }
     } catch (excepcio::entradaIncorrecta ex) {
         cerr << ex.missatge << endl;

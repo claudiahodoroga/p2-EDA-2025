@@ -17,8 +17,9 @@
 using namespace std;
 
 // la solución es una serie de puertas con vuelos asignados a sus slots
-// TODO: diferenciar entre solucion voraz, una sol, mejor sol
 
+
+// CLASE BASE
 class Solucio {
 public:
     Solucio()
@@ -26,14 +27,14 @@ public:
     _nPortesInter(0), _nPortesReg(0), _ho(0), _ht(0)  {}
     Solucio(int maxPortesReg, int maxPortesInt, const string& Ho, const string& Ht,
         const vector<Vol>&vols);
-
-    // virtual destructor?
+    virtual ~Solucio() = default;
 
     int obtNumPortes() const;
     int obtNumPortesInter() const;
     int obtNumPortesReg() const;
     int obtMaxSlots() const;
     const vector<Porta>& obtPortes() const;
+    const vector<Vol>& obtVols() const;
 
     // métricas
     int calcuarSlotsInactius() const;
@@ -62,19 +63,21 @@ protected:
     bool potCrearPorta(char tipus) const; ///< Comprueba que se pueda crear una nueva puerta de tipo @param tipus
     void crearNovaPorta(char tipus); ///< Crea nueva puerta de tipo @param tipus
     int horaToMin(const string& h) const; ///< Conversión de HH:MM a minutos
+    string minToHora(int minuts) const; ///< Conversión de minutos a HH:MM
 };
 
 // SOLUCIÓN VORAZ
 class SolucioVoraz : public Solucio {
     public:
-    SolucioVoraz(int maxPortesReg, int maxPortesInt, const string& Ho, const string& Ht, const vector<Vol>& vols)
-        : Solucio(maxPortesReg, maxPortesInt, Ho, Ht, vols) {}
+    SolucioVoraz(int maxPortesReg, int maxPortesInt, const string& Ho,
+                 const string& Ht, const vector<Vol>& vols);
 
     bool assignarVolsVoraz(); ///< Asigna vuelos con método voraz. Devuelve true si todos están asignados
 
     private:
     bool assignarVol(int idxVol); ///< Intenta asignar un vuelo al primer slot disponible. Devuelve true si se puede
     pair<int, int> trobarPrimeraOpcio(const Vol& vol) const; ///< Método auxiliar para encontrar el primer slot compatible con el vuelo @param vol
+    void ordenarVols(); ///< Ordena los vuelos por la longitud de su servicio
 };
 
 // BASE PARA BACKTRACKING
@@ -92,12 +95,11 @@ class SolucioBacktracking : public Solucio {
     int obtNivell() const;
     protected:
     int _niv; ///< Nivel actual de la recursión. Corresponde al índice del vuelo que se está asignando.
-
     bool slotsDisponibles(int idxPorta, int slotInicio, int numSlots) const; ///< Método auxiliar para función aceptable
     bool compatibleAmbFinestra(int slotInicio, const Vol& vol) const; ///< Método auxiliar para comprobar si el slot es compatible con la ventana de servicio del vuelo
 };
 
-// SOLUCIÓN PARA BACKTRACKING UNA SOLUCION
+// SOLUCIÓN PARA BACKTRACKING UNA SOLUCION. No necesita nada adicional a la clase base.
 class SolucioUna : public SolucioBacktracking {
     public:
     SolucioUna(int maxPortesReg, int maxPortesInt, const string& Ho, const string& Ht, const vector<Vol>& vols)
@@ -107,16 +109,11 @@ class SolucioUna : public SolucioBacktracking {
 // SOLUCIÓN PARA BACKTRACKING MEJOR SOLUCIÓN
 class SolucioMillor : public SolucioBacktracking {
     public:
-    SolucioMillor(int maxPortesReg, int maxPortesInt, const string& Ho, const string& Ht, const vector<Vol>& vols)
-    : SolucioBacktracking(maxPortesReg, maxPortesInt, Ho, Ht, vols), _millorSlotsInactius(INT_MAX), _millorMinGap(-1) {}
-    bool esMillor() const; ///< Comprobar si la solución actual es mejor que la optima
-    bool potSerMillor() const; ///< Comprobar si la solución actual puede llegar a ser mejor que la optima
-    void guardarMillor();
-    private:
-    vector<Porta> _millorPortes;
-    int _millorSlotsInactius;
-    int _millorMinGap;
-
+    SolucioMillor(int maxPortesReg, int maxPortesInt, const string& Ho,
+                  const string& Ht, const vector<Vol>& vols)
+        : SolucioBacktracking(maxPortesReg, maxPortesInt, Ho, Ht, vols) {}
+    bool esMillor(int optimaSlotsInactius, int optimaMinGap) const; ///< Comprobar si la solución actual es mejor que la optima
+    bool potSerMillor(int idxPortaCand, int idxSlotCand, int optimaSlotsInactius) const; ///< Comprobar si la solución actual puede llegar a ser mejor que la optima
 };
 
 #endif //P2_EDA_2025_SOLUCIO_H

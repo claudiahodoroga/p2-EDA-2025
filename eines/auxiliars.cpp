@@ -25,8 +25,8 @@ Parametres::Parametres() {
     tipoCalculo = 'b';
     Ho = "06:00";
     Ht = "22:00";
-    Pr = numeric_limits<int>::infinity();
-    Pi = numeric_limits<int>::infinity();
+    Pr = INT_MAX;
+    Pi = INT_MAX;
     path = "";
     ajuda = false;
 }
@@ -207,7 +207,8 @@ int llegirDades(const string &path, vector<Vol> &vols) {
     return nDades;
 }
 
-// TODO: implementar :)
 void mostrarResultat(const Solucio &sol, const duration<double> &duracio) {
     // Implementación de la lógica de visualización de resultados
+    sol.mostrarSolucio();
+    cout << "Temps: " << duracio.count() << " segons" << endl;
 }

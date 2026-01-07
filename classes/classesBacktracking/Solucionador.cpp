@@ -4,168 +4,96 @@
 
 #include "Solucionador.h"
 
-// TODO: pasar solución inicial a los métodos...
-
 // SOLUCIONADOR VORAZ
-bool SolucionadorVoraz::solucionar() {
-    return _sol.assignarVolsVoraz();
-}
-
-void SolucionadorVoraz::mostrarResultat() const {
-    _sol.mostrarSolucio();
+void SolucionadorVoraz::solucionar(SolucioVoraz& sol) {
+    if (!sol.assignarVolsVoraz()) {
+        cerr << "No s'ha pogut trobar una solució voraç." << endl;
+    }
 }
 
 // SOLUCIONADOR UNA SOLUCIÓN
-bool SolucionadorUna::solucionar() {
+void SolucionadorUna::solucionar(Solucio& solBase) {
+    SolucioUna& sol = dynamic_cast<SolucioUna&>(solBase);
     _trobat = false;
-    backtracking();
-    return _trobat;
+    backtracking(sol);
 }
 
-void SolucionadorUna::backtracking() {
-    Candidats cand = _sol.inicialitzarCandidats();
+// TODO: añadir condición de completa si cal
+void SolucionadorUna::backtracking(SolucioUna& actual) {
 
-    while (!cand.esFi() && !_trobat) {
-        pair<int, int> portaSlot = cand.actual();
-        if (_sol.acceptable(portaSlot.first, portaSlot.second)) {
-            _sol.anotar(portaSlot.first, portaSlot.second);
-            backtracking();
-            if (!_trobat) {
-                _sol.desanotar(portaSlot.first, portaSlot.second);
+    Candidats cands = actual.inicialitzarCandidats();
+
+    while (!cands.esFi() && !_trobat) {
+        pair<int, int> candidat = cands.actual();
+        int idxPorta = candidat.first;
+        int idxSlot = candidat.second;
+        if (actual.acceptable(idxPorta, idxSlot)) {
+            actual.anotar(idxPorta, idxSlot);
+            if (!actual.completa()) {
+                backtracking(actual);
+                if (!_trobat) {
+                    actual.desanotar(idxPorta, idxSlot);
+                }
             }
+            _trobat = true;
         }
-        cand.seguent();
+        cands.seguent();
     }
-}
-
-void SolucionadorUna::mostrarResultat() const {
-    if (_trobat) {
-        _sol.mostrarSolucio();
-    }
-    else throw("No hi ha solució per la configuració indicada");
 }
 
 // BACKTRACKING MILLOR SOLUCIO
-bool SolucionadorMillor::solucionar() {
-    _trobatAlguna = false;
-    backtracking();
-    return _trobatAlguna;
+void SolucionadorMillor::solucionar(Solucio& solBase) {
+    SolucioMillor& sol = dynamic_cast<SolucioMillor&>(solBase);
+    // inicializar optima como copia vacía
+    _optima = new SolucioMillor(sol);
+    _millorSlotsInactius = INT_MAX;
+    _millorMinGap = -1;
+    _teMillor = false;
+
+    backtracking(sol);
+    // copiar óptima para mostrarla
+    if (_teMillor) {
+        sol = *_optima;
+    }
+
+    delete _optima;
+    _optima = nullptr;
 }
 
-void SolucionadorMillor::backtracking(SolucioMillor& sol) {
-    Candidats cand = sol.inicialitzarCandidats();
+bool SolucionadorMillor::teMillorSolucio() const {
+    return _teMillor;
+}
+
+// TODO: añadir condición de es millor
+void SolucionadorMillor::backtracking(SolucioMillor& actual) {
+    Candidats cand = actual.inicialitzarCandidats();
 
     while (!cand.esFi()) {
         pair<int, int> portaSlot = cand.actual();
-        if (sol.acceptable(portaSlot.first, portaSlot.second) &&
-            sol.potSerMillor()) {
-            sol.anotar(portaSlot.first, portaSlot.second);
-            backtracking(sol);
-            sol.desanotar(portaSlot.first, portaSlot.second);
-        }
-        cand.seguent();
-    }
-}
+        int idxPorta = portaSlot.first;
+        int idxSlot = portaSlot.second;
+        if (actual.acceptable(idxPorta, idxSlot) &&
+            actual.potSerMillor(idxPorta, idxSlot, _millorSlotsInactius)) {
 
-void SolucionadorMillor::mostrarResultat(const SolucioMillor& sol) const {
-    if (_trobatAlguna) {
-        sol.mostrarSolucio();
-    }
-    else throw("No hi ha solució per la configuració indicada.");
-}
+            actual.anotar(idxPorta, idxSlot);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void Voraz::solucionar(Solucio &sol) {
-    Candidats cand = sol.inicialitzarCandidats();
-    while (!sol.completa() && !cand.esFiSlots()) {
-        if (sol.completable(cand.actual())) {
-            sol.anotar(cand.actual());
-        }
-    }
-
-    if (sol.completa()) {
-         cerr << "solucion voraz completa" << endl;
-    }
-    else {
-        cerr << "no hay solucion voraz" << endl;
-    }
-}
-
-// modificar solución inicial para que al terminar la recursividad, contenga la solución final
-void BacktrackingUnaSol::solucionar(const Solucio &inicial) {
-    encertat = false;
-    actual = inicial;
-    backtrackingUna(actual);
-    // mostrar sol?
-}
-
-// TODO: revisar que la estructura tenga sentido con el problema pq no sé qué hago
-void BacktrackingUnaSol::backtrackingUna() {
-    // inicializar cand
-    Candidats cand = actual.inicialitzarCandidats();
-    // mientras queden cand y no encertat:
-    while (!cand.esFiSlots() && !actual.completa()) {
-        if (actual.acceptable(cand.actual())) {
-            actual.anotar(cand.actual());
             if (!actual.completa()) {
-                backtrackingUna(actual);
-                if (!encertat) {
-                    sol.desanotar(cand.actual());
+                backtracking(actual);
+            }
+
+            else {
+                if (actual.esMillor(_millorSlotsInactius, _millorMinGap)) {
+                    *_optima = actual;
+                    _millorSlotsInactius = actual.calcuarSlotsInactius();
+                    _millorMinGap = actual.calcularMinGap();
+                    _teMillor = true;
                 }
             }
-            else encertat = true;
+            actual.desanotar(idxPorta, idxSlot);
         }
         cand.seguent();
     }
 }
-
-
-void BacktrackingMillorSol::solucionar(const Solucio &inicial) {
-    Solucio actual = optima = inicial;
-    backtrackingMillor(actual);
-    // mostrar sol?
-}
-
-void BacktrackingMillorSol::backtrackingMillor(const Solucio &actual) {
-    // inicializar candidatos
-    Candidats cand = actual.inicialitzarCandidats();
-
-    while (!cand.esFiSlots()) {
-        if (actual.acceptable(cand.actual())) { // TODO: añadir condición de potSerMillor
-            actual.anotar(cand.actual());
-            if (!actual.completa()) {
-                backtrackingMillor(actual);
-            }
-            else if (actual.esMillor(optima)) {
-                optima = actual;
-            }
-            actual.desanotar(cand.actual());
-        }
-        actual.seguent();
-    }
-}
-
 
 
 

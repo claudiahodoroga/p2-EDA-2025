@@ -35,7 +35,11 @@ public:
 
     char obtDesti() const;
 
+    int obtId() const;
+
     bool operator<(const Vol &v) const;
+
+    void mostrar(int horaSortida) const;
 
 private:
     int _id; ///< identificador del vuelo
