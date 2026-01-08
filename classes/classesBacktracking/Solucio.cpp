@@ -58,6 +58,22 @@ const vector<Vol> & Solucio::obtVols() const {
     return _vols;
 }
 
+int Solucio::obtMaxPortesInter() const {
+    return _maxPortesInter;
+}
+
+int Solucio::obtMaxPortesReg() const {
+    return _maxPortesReg;
+}
+
+int Solucio::obtHo() const {
+    return _ho;
+}
+
+int Solucio::obtHt() const {
+    return _ht;
+}
+
 bool Solucio::potCrearPorta(char tipus) const {
     if (tipus == 'i' || tipus =='I') {
         return _nPortesInter < _maxPortesInter;
@@ -219,7 +235,7 @@ pair<int, int> SolucioVoraz::trobarPrimeraOpcio(const Vol& vol) const {
                     // comprobar compatibilidad temporal
                     int horaSortida = _ho + ((slot + slotsNecessaris) * 15);
                     if (horaSortida >= horaInMin && horaSortida <= horaFiMax) {
-                        return make_pair(idxPorta, horaSortida);
+                        return make_pair(idxPorta, slot);
                     }
                 }
                 slot++;

@@ -46,18 +46,6 @@ int main(int argn, char **argv) {
 
                 mostrarResultat(sol, duracio);
             }
-            else if (p.tipoCalculo == 'b') { // TODO: no se especificará una b, sino que se incluirá sin el parámetro
-                cerr << "usando backtracking una solución" << endl;
-
-                SolucioUna sol(p.Pr, p.Pi, p.Ho, p.Ht, vols);
-                SolucionadorUna solucionador;
-                solucionador.solucionar(sol);
-
-                high_resolution_clock::time_point t2 = high_resolution_clock::now();
-                duration<double> duracio = duration_cast<duration<double>>(t2 - t1);
-
-                mostrarResultat(sol, duracio);
-            }
             else if (p.tipoCalculo == 'm') {
                 cerr << "usando backtracking mejor solución" << endl;
 
@@ -68,7 +56,31 @@ int main(int argn, char **argv) {
                 high_resolution_clock::time_point t2 = high_resolution_clock::now();
                 duration<double> duracio = duration_cast<duration<double>>(t2 - t1);
 
-                mostrarResultat(sol, duracio);
+                if (solucionador.teMillorSolucio()) {
+                    mostrarResultat(sol, duracio);
+                }
+                else {
+                    cout << "No hi ha solucio per la configuracio indicada" << endl;
+                    cout << "Temps: " << duracio.count() << " segons" << endl;
+                }
+            }
+            else {
+                cerr << "usando backtracking una solución" << endl;
+
+                SolucioUna sol(p.Pr, p.Pi, p.Ho, p.Ht, vols);
+                SolucionadorUna solucionador;
+                solucionador.solucionar(sol);
+
+                high_resolution_clock::time_point t2 = high_resolution_clock::now();
+                duration<double> duracio = duration_cast<duration<double>>(t2 - t1);
+
+                if (sol.obtNumPortes()>0) {
+                    mostrarResultat(sol, duracio);
+                }
+                else {
+                    cout << "No hi ha solucio per la configuracio indicada" << endl;
+                    cout << "Temps: " << duracio.count() << " segons" << endl;
+                }
             }
         }
     } catch (excepcio::entradaIncorrecta ex) {

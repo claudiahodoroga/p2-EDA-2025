@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include <limits>
+#include <climits>
 #include <vector>
 
 #include "Candidats.h"
@@ -35,10 +35,17 @@ public:
     int obtMaxSlots() const;
     const vector<Porta>& obtPortes() const;
     const vector<Vol>& obtVols() const;
+    int obtMaxPortesInter() const;
+    int obtMaxPortesReg() const;
+    int obtHo() const;
+    int obtHt() const;
 
     // métricas
     int calcuarSlotsInactius() const;
     int calcularMinGap() const;
+
+    int horaToMin(const string& h) const; ///< Conversión de HH:MM a minutos
+    string minToHora(int minuts) const; ///< Conversión de minutos a HH:MM
 
     void mostrarSolucio() const;
 
@@ -62,8 +69,7 @@ protected:
     // Métodos auxiliares
     bool potCrearPorta(char tipus) const; ///< Comprueba que se pueda crear una nueva puerta de tipo @param tipus
     void crearNovaPorta(char tipus); ///< Crea nueva puerta de tipo @param tipus
-    int horaToMin(const string& h) const; ///< Conversión de HH:MM a minutos
-    string minToHora(int minuts) const; ///< Conversión de minutos a HH:MM
+
 };
 
 // SOLUCIÓN VORAZ
@@ -112,6 +118,34 @@ class SolucioMillor : public SolucioBacktracking {
     SolucioMillor(int maxPortesReg, int maxPortesInt, const string& Ho,
                   const string& Ht, const vector<Vol>& vols)
         : SolucioBacktracking(maxPortesReg, maxPortesInt, Ho, Ht, vols) {}
+    // ctor de copia
+    SolucioMillor(const SolucioMillor& sol)
+        : SolucioBacktracking(sol._maxPortesReg, sol._maxPortesInter,
+                              sol.minToHora(sol._ho), sol.minToHora(sol._ht), sol._vols) {
+        _portes = sol._portes;
+        _nPortesInter = sol._nPortesInter;
+        _nPortesReg = sol._nPortesReg;
+        _niv = sol._niv;
+    }
+    // operador de asignación
+    SolucioMillor& operator=(const SolucioMillor& sol) {
+        if (this != &sol) {
+            // copiar miembros de la clase base
+            _vols = sol._vols;
+            _maxPortesReg = sol._maxPortesReg;
+            _maxPortesInter = sol._maxPortesInter;
+            _maxSlots = sol._maxSlots;
+            _ho = sol._ho;
+            _ht = sol._ht;
+
+            // copiar miembros de la clase derivada
+            _portes = sol._portes;
+            _nPortesInter = sol._nPortesInter;
+            _nPortesReg = sol._nPortesReg;
+            _niv = sol._niv;
+        }
+        return *this;
+    }
     bool esMillor(int optimaSlotsInactius, int optimaMinGap) const; ///< Comprobar si la solución actual es mejor que la optima
     bool potSerMillor(int idxPortaCand, int idxSlotCand, int optimaSlotsInactius) const; ///< Comprobar si la solución actual puede llegar a ser mejor que la optima
 };

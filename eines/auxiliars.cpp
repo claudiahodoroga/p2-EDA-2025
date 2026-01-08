@@ -6,9 +6,6 @@
 #include <sstream>
 #include <iomanip>
 #include <chrono>
-
-// Necesario para el cuerpo de mostrarResultat si se usa Solucio
-// y duration<double>. Se asume que Solucio está definida en "classes/classesBacktracking/Solucio.h"
 #include "eines.h"
 #include "../classes/classesBacktracking/Solucio.h"
 
@@ -114,7 +111,7 @@ void mostrarAjuda(const char *nomPrograma) {
 Parametres processaParametres(int argn, char **argv) {
     Parametres p;
 
-    if (argn < 2 || argn > 7) {
+    if (argn < 2) {
         throw excepcio::entradaIncorrecta("Nombre d'arguments invàlid");
     }
 
@@ -153,9 +150,8 @@ Parametres processaParametres(int argn, char **argv) {
             p.tipoCalculo = 'm';
         } else if (param == "-v") {
             p.tipoCalculo = 'v';
-        } else if (nParams == argn - 1) {
-            // TODO: excepción de si no está incluido el path
-            // Asume que el último parámetro es el path
+        } else if (param[0] != '-') {
+            // se asume que el parámetro sin un '-' es el path
             p.path = argv[nParams];
         }
         nParams++;

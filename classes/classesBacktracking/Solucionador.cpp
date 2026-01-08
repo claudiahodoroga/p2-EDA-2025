@@ -18,7 +18,6 @@ void SolucionadorUna::solucionar(Solucio& solBase) {
     backtracking(sol);
 }
 
-// TODO: añadir condición de completa si cal
 void SolucionadorUna::backtracking(SolucioUna& actual) {
 
     Candidats cands = actual.inicialitzarCandidats();
@@ -46,28 +45,25 @@ void SolucionadorUna::backtracking(SolucioUna& actual) {
 // BACKTRACKING MILLOR SOLUCIO
 void SolucionadorMillor::solucionar(Solucio& solBase) {
     SolucioMillor& sol = dynamic_cast<SolucioMillor&>(solBase);
-    // inicializar optima como copia vacía
-    _optima = new SolucioMillor(sol);
+    // variable local para optima por errores de memoria
+    SolucioMillor optima(sol.obtMaxPortesReg(), sol.obtMaxPortesInter(), sol.minToHora(sol.obtHo()), sol.minToHora(sol.obtHt()), sol.obtVols());
+
     _millorSlotsInactius = INT_MAX;
     _millorMinGap = -1;
     _teMillor = false;
 
-    backtracking(sol);
+    backtracking(sol, optima);
     // copiar óptima para mostrarla
     if (_teMillor) {
-        sol = *_optima;
+        sol = optima;
     }
-
-    delete _optima;
-    _optima = nullptr;
 }
 
 bool SolucionadorMillor::teMillorSolucio() const {
     return _teMillor;
 }
 
-// TODO: añadir condición de es millor
-void SolucionadorMillor::backtracking(SolucioMillor& actual) {
+void SolucionadorMillor::backtracking(SolucioMillor& actual, SolucioMillor& optima) {
     Candidats cand = actual.inicialitzarCandidats();
 
     while (!cand.esFi()) {
@@ -80,12 +76,12 @@ void SolucionadorMillor::backtracking(SolucioMillor& actual) {
             actual.anotar(idxPorta, idxSlot);
 
             if (!actual.completa()) {
-                backtracking(actual);
+                backtracking(actual, optima);
             }
 
             else {
                 if (actual.esMillor(_millorSlotsInactius, _millorMinGap)) {
-                    *_optima = actual;
+                    optima = actual;
                     _millorSlotsInactius = actual.calcuarSlotsInactius();
                     _millorMinGap = actual.calcularMinGap();
                     _teMillor = true;

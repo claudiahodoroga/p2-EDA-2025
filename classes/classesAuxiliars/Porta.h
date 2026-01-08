@@ -7,7 +7,7 @@
 
 #include <iostream>
 #include <iomanip>
-#include <limits>
+#include <climits>
 #include <map>
 #include <vector>
 

@@ -5,6 +5,8 @@
 #ifndef P2_EDA_2025_SOLUCIONADOR_H
 #define P2_EDA_2025_SOLUCIONADOR_H
 #include <iostream>
+#include <fstream>
+#include <climits>
 #include "Solucio.h"
 
 using namespace std;
@@ -42,8 +44,7 @@ public:
     void solucionar(Solucio& solBase) override;
     bool teMillorSolucio() const;
 private:
-    void backtracking(SolucioMillor& actual); ///< Recursividad
-    SolucioMillor* _optima; ///< Mejor solución encontrada actualmente
+    void backtracking(SolucioMillor& actual, SolucioMillor& optima); ///< Recursividad
     int _millorSlotsInactius; ///< Métricas de la mejor solución
     int _millorMinGap;
     bool _teMillor; ///< Para saber si se ha encontrado al menos una solución
